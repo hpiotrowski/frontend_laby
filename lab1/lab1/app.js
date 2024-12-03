@@ -21,8 +21,8 @@ function displayPokemona(pokemon) {
     detailsElement.innerHTML = `
         <h3>${pokemon.name.toUpperCase()}</h3>
         <img src="${pokemon.sprites.front_default}" alt="${pokemon.name}">
-        <p><strong>Waga:</strong> ${pokemon.weight / 10} kg</p>
-        <p><strong>Wzrost:</strong> ${pokemon.height / 10} m</p>
+        <p><strong>Waga:</strong> ${pokemon.weight / 10} </p>
+        <p><strong>Wzrost:</strong> ${pokemon.height / 10} </p>
         <p><strong>Typy:</strong> ${pokemon.types.map(type => type.type.name).join(", ")}</p>
     `;
     const backButton = document.createElement("button");
@@ -36,11 +36,6 @@ function displayPokemona(pokemon) {
 function displayErrorMessage(message) {
     const detailsElement = document.getElementById("pokemonDetails");
     detailsElement.innerHTML = `<p style="color: red;">${message}</p>`;
-    
-    const backButton = document.createElement("button");
-    backButton.textContent = "Wróć do listy";
-    backButton.addEventListener("click", () => listaPokemonow());
-    detailsElement.appendChild(backButton);
 }
 
 
@@ -68,15 +63,27 @@ async function listaPokemonow() {
 }
 
 
-function displayListaPokemonow(pokemons) {
+async function displayListaPokemonow(pokemons) {
     const detailsElement = document.getElementById("pokemonDetails");
     detailsElement.innerHTML = "<h3>Lista Pokemonów:</h3>";
-    pokemons.forEach((pokemon, index) => {
+
+    for (let index = 0; index < pokemons.length; index++) {
+        const pokemon = pokemons[index];
+        const response = await fetch(pokemon.url); 
+        const data = await response.json();
+
         const button = document.createElement("button");
-        button.textContent = `${index + 1}. ${pokemon.name}`;
+        button.innerHTML = `<img src="${data.sprites.front_default}" alt="${pokemon.name}" style="width:30px; margin-right:10px;"> ${index + 1}. ${pokemon.name}`;
+        button.style.display = "flex";
+        button.style.alignItems = "center";
+        button.style.justifyContent = "flex-start"; 
+        button.style.width = "200px"; 
+        button.style.height = "50px"; 
+        button.style.marginBottom = "10px";
+
         button.addEventListener("click", () => pobierzDane(pokemon.name));
         detailsElement.appendChild(button);
-    });
+    }
 }
 
 
