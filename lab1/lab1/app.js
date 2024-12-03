@@ -36,8 +36,12 @@ function displayPokemona(pokemon) {
 function displayErrorMessage(message) {
     const detailsElement = document.getElementById("pokemonDetails");
     detailsElement.innerHTML = `<p style="color: red;">${message}</p>`;
+    
+    const backButton = document.createElement("button");
+    backButton.textContent = "Wróć do listy";
+    backButton.addEventListener("click", () => listaPokemonow());
+    detailsElement.appendChild(backButton);
 }
-
 
 document.getElementById("searchButton").addEventListener("click", () => {
     const searchInput = document.getElementById("searchInput").value.trim();
