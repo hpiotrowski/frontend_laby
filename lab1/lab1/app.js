@@ -36,6 +36,11 @@ function displayPokemona(pokemon) {
 function displayErrorMessage(message) {
     const detailsElement = document.getElementById("pokemonDetails");
     detailsElement.innerHTML = `<p style="color: red;">${message}</p>`;
+    
+    const backButton = document.createElement("button");
+    backButton.textContent = "Wróć do listy";
+    backButton.addEventListener("click", () => listaPokemonow());
+    detailsElement.appendChild(backButton);
 }
 
 
@@ -49,9 +54,9 @@ document.getElementById("searchButton").addEventListener("click", () => {
 });
 
 
-async function listaPokemonow(limit = 20) {
+async function listaPokemonow() {
     try {
-        const response = await fetch(`${pokemonURL}?limit=${limit}`);
+        const response = await fetch(`${pokemonURL}?limit=${20}`);
         if (!response.ok) {
             throw new Error("Nie udało się pobrać listy Pokemonów.");
         }
