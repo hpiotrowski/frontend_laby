@@ -1,9 +1,14 @@
 const pokemonURL = "https://pokeapi.co/api/v2/pokemon";
 
-let pokemonList = [];
-let pokemonDetails = null;
-let errorMessage = null;
+// Funkcja renderująca aplikację
+const renderApp = () => {
+    ReactDOM.render(
+        <App />,
+        document.getElementById('root')
+    );
+};
 
+// Główna funkcja pobierająca listę pokemonów
 const listaPokemonow = async () => {
     try {
         const response = await fetch(`${pokemonURL}?limit=20`);
@@ -11,10 +16,7 @@ const listaPokemonow = async () => {
             throw new Error("Nie udało się pobrać listy Pokemonów.");
         }
         const data = await response.json();
-        pokemonList = data.results;
-
-    
-        const pokemonDetailsPromises = pokemonList.map(async (pokemon) => {
+        const pokemonDetailsPromises = data.results.map(async (pokemon) => {
             const response = await fetch(pokemon.url);
             const data = await response.json();
             return {
@@ -28,35 +30,70 @@ const listaPokemonow = async () => {
         });
 
         const detailedPokemonData = await Promise.all(pokemonDetailsPromises);
-        pokemonList = detailedPokemonData;  
-        errorMessage = null;
+        displayListaPokemonow(detailedPokemonData);
     } catch (error) {
-        errorMessage = error.message;
-        pokemonList = [];
+        console.error(error.message);
+        displayErrorMessage(error.message);
     }
-    renderApp();
 };
 
+// Funkcja pobierająca szczegóły pojedynczego pokemona
+const pobierzDane = async (pokemonName) => {
+    const url = `${pokemonURL}/${pokemonName.toLowerCase()}`;
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Błąd: Nie znaleziono Pokemona o nazwie "${pokemonName}".`);
+        }
+        const data = await response.json();
+        displayPokemona(data);
+    } catch (error) {
+        console.error(error.message);
+        displayErrorMessage(error.message);
+    }
+};
 
-const renderApp = () => {
+// Funkcje wyświetlające
+const displayPokemona = (pokemon) => {
     ReactDOM.render(
-        <App />,
+        <PokemonDetails 
+            pokemon={{
+                name: pokemon.name,
+                sprite: pokemon.sprites.front_default,
+                weight: pokemon.weight,
+                height: pokemon.height,
+                types: pokemon.types.map(type => type.type.name)
+            }}
+            onBack={listaPokemonow}
+        />,
         document.getElementById('root')
     );
 };
 
+const displayListaPokemonow = (pokemons) => {
+    ReactDOM.render(
+        <App pokemonList={pokemons} />,
+        document.getElementById('root')
+    );
+};
 
-const App = () => {
+const displayErrorMessage = (message) => {
+    ReactDOM.render(
+        <ErrorMessage message={message} onBack={listaPokemonow} />,
+        document.getElementById('root')
+    );
+};
+
+// Komponenty React
+const App = ({ pokemonList = [] }) => {
     return (
         <div>
             <h2>Wyszukaj Pokemona</h2>
             <PokemonSearch />
-            <PokemonList />
-            <PokemonDetails />
+            <PokemonList pokemonList={pokemonList} />
         </div>
     );
 };
-
 
 const PokemonSearch = () => {
     let searchQuery = '';
@@ -69,7 +106,7 @@ const PokemonSearch = () => {
         if (searchQuery) {
             pobierzDane(searchQuery);
         } else {
-            alert("Wpisz nazwę Pokemona");
+            displayErrorMessage("Wpisz nazwę Pokemona.");
         }
     };
 
@@ -85,28 +122,33 @@ const PokemonSearch = () => {
     );
 };
 
-
-const PokemonList = () => {
+const PokemonList = ({ pokemonList }) => {
     if (pokemonList.length === 0) {
         return <p>Ładowanie listy Pokemonów...</p>;
     }
 
     return (
         <div id="pokemonList">
-            <h3 className="pokemon-list-heading">Lista Pokemonów:</h3>
+            <h3>Lista Pokemonów:</h3>
             <div className="pokemon-grid">
                 {pokemonList.map((pokemon, index) => (
                     <button
                         key={index}
                         onClick={() => pobierzDane(pokemon.name)}
-                        className="pokemon-card"
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            width: '200px',
+                            height: '50px',
+                            marginBottom: '10px'
+                        }}
                     >
                         <img
                             src={pokemon.sprite}
                             alt={pokemon.name}
-                            className="pokemon-img"
+                            style={{ width: '30px', marginRight: '10px' }}
                         />
-                        <span className="pokemon-name">{index + 1}. {pokemon.name}</span>
+                        <span>{index + 1}. {pokemon.name}</span>
                     </button>
                 ))}
             </div>
@@ -114,51 +156,27 @@ const PokemonList = () => {
     );
 };
 
-
-
-const PokemonDetails = () => {
-    if (errorMessage) {
-        return <p style={{ color: 'red' }}>{errorMessage}</p>;
-    }
-
-    if (pokemonDetails) {
-        return (
-            <div id="pokemonDetails">
-                <h3>{pokemonDetails.name.toUpperCase()}</h3>
-                <img src={pokemonDetails.sprite} alt={pokemonDetails.name} />
-                <p><strong>Waga:</strong> {pokemonDetails.weight / 10} kg</p>
-                <p><strong>Wzrost:</strong> {pokemonDetails.height / 10} m</p>
-                <p><strong>Typy:</strong> {pokemonDetails.types.join(', ')}</p>
-            </div>
-        );
-    }
-
-    return null;
+const PokemonDetails = ({ pokemon, onBack }) => {
+    return (
+        <div id="pokemonDetails">
+            <h3>{pokemon.name.toUpperCase()}</h3>
+            <img src={pokemon.sprite} alt={pokemon.name} />
+            <p><strong>Waga:</strong> {pokemon.weight / 10} kg</p>
+            <p><strong>Wzrost:</strong> {pokemon.height / 10} m</p>
+            <p><strong>Typy:</strong> {pokemon.types.join(', ')}</p>
+            <button onClick={onBack}>Wróć do listy</button>
+        </div>
+    );
 };
 
-const pobierzDane = async (pokemonName) => {
-    const url = `${pokemonURL}/${pokemonName.toLowerCase()}`;
-    try {
-        const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error(`Błąd: Nie znaleziono Pokemona o nazwie "${pokemonName}".`);
-        }
-        const data = await response.json();
-        pokemonDetails = {
-            name: data.name,
-            id: data.id,
-            sprite: data.sprites.front_default,
-            height: data.height,
-            weight: data.weight,
-            types: data.types.map(type => type.type.name),
-        };
-        errorMessage = null;
-    } catch (error) {
-        errorMessage = error.message;
-        pokemonDetails = null;
-    }
-    renderApp();
+const ErrorMessage = ({ message, onBack }) => {
+    return (
+        <div>
+            <p style={{ color: 'red' }}>{message}</p>
+            <button onClick={onBack}>Wróć do listy</button>
+        </div>
+    );
 };
 
+// Inicjalizacja aplikacji
 listaPokemonow();
-renderApp(); 

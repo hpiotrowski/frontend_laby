@@ -65,3 +65,4 @@ window.pobierzDane = async (pokemonName) => {
     }
     window.renderApp();
 };
+window.listaPokemonow()
