@@ -2,7 +2,7 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f4f4f9;
+    background-color: hsl(240, 29%, 97%);
     color: #333;
 }
 
@@ -73,8 +73,8 @@ button:hover {
     gap: 15px;
     padding: 20px;
     text-align: center;
-    max-width: 1200px;  /* Opcjonalnie, aby ograniczyć szerokość gridu */
-    margin: 0 auto;     /* Wycentrowanie gridu */
+    max-width: 1200px;  
+    margin: 0 auto;    
 }
 
 .pokemon-card {
@@ -87,7 +87,6 @@ button:hover {
     border-radius: 10px;
     padding: 15px;
     cursor: pointer;
-    transition: transform 0.2s, background-color 0.3s ease-in-out;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     height: 220px;
     width: 180px;
@@ -95,7 +94,7 @@ button:hover {
 }
 
 .pokemon-card:hover {
-    transform: translateY(-5px);
+    transform: scale(1.05);
     background-color: #f8f8f8;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }

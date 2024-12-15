@@ -1,11 +1,11 @@
 const PokemonSearch = () => {
     let searchQuery = '';
 
-    const handleSearchChange = (event) => {
+    const zapiszWartosc = (event) => {
         searchQuery = event.target.value;
     };
 
-    const handleSearch = () => {
+    const wyszukaj = () => {
         if (searchQuery) {
             pobierzDane(searchQuery);
         } else {
@@ -18,9 +18,9 @@ const PokemonSearch = () => {
             <input
                 type="text"
                 placeholder="Wpisz nazwę pokemona"
-                onChange={handleSearchChange}
+                onChange={zapiszWartosc}
             />
-            <button onClick={handleSearch}>Szukaj</button>
+            <button onClick={wyszukaj}>Szukaj</button>
         </div>
     );
 };

@@ -1,7 +1,5 @@
 const PokemonList = ({ pokemonList }) => {
-    if (pokemonList.length === 0) {
-        return <p>Ładowanie listy Pokemonów...</p>;
-    }
+   
 
     return (
         <div id="pokemonList">

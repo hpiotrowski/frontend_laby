@@ -21,8 +21,8 @@ function displayPokemona(pokemon) {
     detailsElement.innerHTML = `
         <h3>${pokemon.name.toUpperCase()}</h3>
         <img src="${pokemon.sprites.front_default}" alt="${pokemon.name}">
-        <p><strong>Waga:</strong> ${pokemon.weight / 10} </p>
-        <p><strong>Wzrost:</strong> ${pokemon.height / 10} </p>
+        <p><strong>Waga:</strong> ${pokemon.weight} </p>
+        <p><strong>Wzrost:</strong> ${pokemon.height} </p>
         <p><strong>Typy:</strong> ${pokemon.types.map(type => type.type.name).join(", ")}</p>
     `;
     const backButton = document.createElement("button");
@@ -66,14 +66,11 @@ async function listaPokemonow() {
     }
 }
 
-
 async function displayListaPokemonow(pokemons) {
     const detailsElement = document.getElementById("pokemonDetails");
     detailsElement.innerHTML = "<h3>Lista Pokemonów:</h3>";
-
-    for (let index = 0; index < pokemons.length; index++) {
-        const pokemon = pokemons[index];
-        const response = await fetch(pokemon.url); 
+    pokemons.map(async (pokemon, index) => {
+        const response = await fetch(pokemon.url);
         const data = await response.json();
 
         const button = document.createElement("button");
@@ -86,8 +83,9 @@ async function displayListaPokemonow(pokemons) {
         button.style.marginBottom = "10px";
 
         button.addEventListener("click", () => pobierzDane(pokemon.name));
-        detailsElement.appendChild(button);
-    }
+        
+        detailsElement.appendChild(button); 
+    });
 }
 
 
