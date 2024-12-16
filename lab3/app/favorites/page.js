@@ -1,7 +1,13 @@
+'use client';
+import FavoritesList from '../components/FavoritesList';
+import Link from 'next/link';
+
 export default function FavoritesPage() {
     return (
-      <div>
-        <p>Brak ulubionych Pokemonów.</p>
-      </div>
+        <div>
+            <h1>Ulubione Pokemony</h1>
+            <FavoritesList />
+            <Link href="/pokemon">Wróć do listy pokemonów</Link>
+        </div>
     );
-  }
+}

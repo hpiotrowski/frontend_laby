@@ -4,7 +4,7 @@ export default function Home() {
   return (
     <main>
       <div>
-        Witaj w projekcie pokemon
+        Strona główna
       </div>
     </main>
   );
