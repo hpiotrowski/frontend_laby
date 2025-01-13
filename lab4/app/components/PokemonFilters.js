@@ -12,29 +12,44 @@ const PokemonFilters = () => {
             const savedFilters = localStorage.getItem('pokemonFilters');
             if (savedFilters) {
                 const filters = JSON.parse(savedFilters);
-                updateFilters(filters);
+                const currentParams = new URLSearchParams(window.location.search);
+                if (!currentParams.toString()) {
+                    updateFilters(filters);
+                }
             }
         } catch (error) {
-            console.error('Error reading from localStorage:', error);
+            console.error('Error reading filters from localStorage:', error);
         }
     }, []);
 
     const updateFilters = (newParams) => {
-        const params = new URLSearchParams(searchParams);
-        Object.entries(newParams).forEach(([key, value]) => {
+        const params = new URLSearchParams(searchParams.toString());
+        
+        // Zachowaj istniejące parametry, które nie są aktualizowane
+        const currentFilters = {
+            search: params.get('search') || '',
+            type: params.get('type') || '',
+            limit: params.get('limit') || '20'
+        };
+
+        // Połącz istniejące parametry z nowymi
+        const updatedFilters = { ...currentFilters, ...newParams };
+
+        // Ustaw parametry w URL
+        Object.entries(updatedFilters).forEach(([key, value]) => {
             if (value) {
                 params.set(key, value);
             } else {
                 params.delete(key);
             }
         });
-        
+
         try {
-            localStorage.setItem('pokemonFilters', JSON.stringify(newParams));
+            localStorage.setItem('pokemonFilters', JSON.stringify(updatedFilters));
         } catch (error) {
-            console.error('Error writing to localStorage:', error);
+            console.error('Error saving filters to localStorage:', error);
         }
-        
+
         router.push(`/pokemon?${params.toString()}`);
     };
 

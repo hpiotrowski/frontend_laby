@@ -7,7 +7,16 @@ const PokemonList = () => {
     const [pokemons, setPokemons] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
-    const [comparisonPokemons, setComparisonPokemons] = useState({ pokemon1: null, pokemon2: null });
+    const [comparisonPokemons, setComparisonPokemons] = useState(() => {
+        if (typeof window === 'undefined') return { pokemon1: null, pokemon2: null };
+        try {
+            const saved = localStorage.getItem('comparisonPokemons');
+            return saved ? JSON.parse(saved) : { pokemon1: null, pokemon2: null };
+        } catch (error) {
+            console.error('Error reading from localStorage:', error);
+            return { pokemon1: null, pokemon2: null };
+        }
+    });
 
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -156,18 +165,14 @@ const PokemonList = () => {
         try {
             if (!comparisonPokemons.pokemon1) {
                 const fullPokemonData = await fetchFullPokemonData(pokemon.id);
-                setComparisonPokemons(prev => {
-                    const newState = { ...prev, pokemon1: fullPokemonData };
-                    localStorage.setItem('comparisonPokemons', JSON.stringify(newState));
-                    return newState;
-                });
+                const newState = { ...comparisonPokemons, pokemon1: fullPokemonData };
+                setComparisonPokemons(newState);
+                localStorage.setItem('comparisonPokemons', JSON.stringify(newState));
             } else if (!comparisonPokemons.pokemon2 && pokemon.id !== comparisonPokemons.pokemon1.id) {
                 const fullPokemonData = await fetchFullPokemonData(pokemon.id);
-                setComparisonPokemons(prev => {
-                    const newState = { ...prev, pokemon2: fullPokemonData };
-                    localStorage.setItem('comparisonPokemons', JSON.stringify(newState));
-                    return newState;
-                });
+                const newState = { ...comparisonPokemons, pokemon2: fullPokemonData };
+                setComparisonPokemons(newState);
+                localStorage.setItem('comparisonPokemons', JSON.stringify(newState));
             }
         } catch (error) {
             console.error('Error fetching Pokemon data for comparison:', error);
